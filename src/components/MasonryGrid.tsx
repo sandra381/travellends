@@ -1,3 +1,4 @@
+import React from 'react';
 import { Destination } from '@/types/travel'
 import { DestinationCard } from './DestinationCard'
 

@@ -1,4 +1,5 @@
 'use client'
+import React from 'react';
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { SearchBar } from './SearchBar'
