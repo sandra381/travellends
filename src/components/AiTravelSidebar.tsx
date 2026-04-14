@@ -15,14 +15,19 @@ interface AiTravelSidebarProps {
 export function AiTravelSidebar({ destination, isOpen, onClose }: AiTravelSidebarProps) {
   const [plan, setPlan] = useState<TravelPlan | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (destination && isOpen) {
       setLoading(true)
       setPlan(null)
+      setError(null)
       generateItinerary(destination)
         .then(data => setPlan(data))
-        .catch(console.error)
+        .catch(err => {
+          console.error(err)
+          setError("Oops! Failed to connect to AI service. Please try again.")
+        })
         .finally(() => setLoading(false))
     }
   }, [destination, isOpen])
@@ -45,6 +50,15 @@ export function AiTravelSidebar({ destination, isOpen, onClose }: AiTravelSideba
         </DialogHeader>
         
         <div className="mt-2">
+          {error && (
+            <div className="flex justify-center py-6">
+              <div className="bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 p-4 rounded-xl border border-red-200 dark:border-red-800 text-center max-w-sm w-full mx-auto shadow-sm">
+                <p className="font-semibold">{error}</p>
+                 <button onClick={() => setError(null)} className="mt-2 text-sm underline opacity-80 hover:opacity-100">Dismiss</button>
+              </div>
+            </div>
+          )}
+          
           {loading && (
             <div className="flex flex-col items-center justify-center py-20 space-y-6 text-primary">
               <Loader2 className="h-12 w-12 animate-spin" />

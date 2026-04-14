@@ -2,7 +2,8 @@ import React from 'react';
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Destination } from '@/types/travel'
-import { MapPin } from 'lucide-react'
+import { MapPin, Heart } from 'lucide-react'
+import { useFavoritesStore } from '@/lib/favorites'
 
 interface DestinationCardProps {
   destination: Destination
@@ -10,6 +11,23 @@ interface DestinationCardProps {
 }
 
 export function DestinationCard({ destination, onClick }: DestinationCardProps) {
+  const { favorites, addFavorite, removeFavorite } = useFavoritesStore()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isFavorite = mounted && favorites.some((d) => d.id === destination.id)
+
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (isFavorite) {
+      removeFavorite(destination.id)
+    } else {
+      addFavorite(destination)
+    }
+  }
   return (
     <Card 
       onClick={() => onClick(destination)}
@@ -24,6 +42,18 @@ export function DestinationCard({ destination, onClick }: DestinationCardProps) 
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80" />
+        
+        {mounted && (
+          <button
+            onClick={toggleFavorite}
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/20 backdrop-blur-md transition-colors hover:bg-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <Heart 
+              className={`h-6 w-6 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+            />
+          </button>
+        )}
       </div>
       <div className="absolute bottom-0 left-0 p-6 w-full">
         <h3 className="text-3xl font-extrabold text-white mb-2 drop-shadow-md">{destination.name}</h3>
