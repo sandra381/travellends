@@ -11,8 +11,11 @@ import { Destination } from '@/types/travel'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Map, Heart } from 'lucide-react'
 
-export function TravelApp() {
-  const searchParams = useSearchParams()
+export interface TravelAppProps {
+  searchParams?: URLSearchParams;
+}
+
+export function TravelApp({ searchParams = useSearchParams() }: TravelAppProps = {}) {
   const query = searchParams?.get('q')?.toLowerCase() || ''
   
   const [selectedDest, setSelectedDest] = useState<Destination | null>(null)

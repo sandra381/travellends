@@ -3,12 +3,20 @@ import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
-import { useTransition, useState } from 'react'
+import { useTransition, useState, useMemo } from 'react'
 
-export function SearchBar() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+
+export interface SearchBarProps {
+  router?: any;
+  pathname?: string;
+  searchParams?: URLSearchParams;
+}
+
+export function SearchBar({ 
+  router = useRouter(), 
+  pathname = usePathname(), 
+  searchParams = useSearchParams() 
+}: SearchBarProps = {}) {
   const [isPending, startTransition] = useTransition()
   const [query, setQuery] = useState(searchParams.get('q') || '')
 
