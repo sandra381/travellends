@@ -1,7 +1,5 @@
 'use client'
-import React from 'react';
-import { useState, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import React, { useState, useMemo } from 'react';
 import { SearchBar } from './SearchBar'
 import { MasonryGrid } from './MasonryGrid'
 import { AiTravelSidebar } from './AiTravelSidebar'
@@ -12,20 +10,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Map, Heart } from 'lucide-react'
 
 export interface TravelAppProps {
-  searchParams?: URLSearchParams;
+  onSearch: (term: string) => void;
+  query: string;
 }
 
-export function TravelApp({ searchParams = useSearchParams() }: TravelAppProps = {}) {
-  const query = searchParams?.get('q')?.toLowerCase() || ''
-  
+export function TravelApp({ 
+  onSearch = () => {}, 
+  query = '' 
+}: TravelAppProps) {
   const [selectedDest, setSelectedDest] = useState<Destination | null>(null)
 
   const filteredDestinations = useMemo(() => {
-    if (!query) return destinations
+    const searchTerm = query.toLowerCase()
+    if (!searchTerm) return destinations
     return destinations.filter((dest) => 
-      dest.name.toLowerCase().includes(query) ||
-      dest.country.toLowerCase().includes(query) ||
-      dest.tags.some(tag => tag.toLowerCase().includes(query))
+      dest.name.toLowerCase().includes(searchTerm) ||
+      dest.country.toLowerCase().includes(searchTerm) ||
+      dest.tags.some(tag => tag.toLowerCase().includes(searchTerm))
     )
   }, [query])
 
@@ -44,7 +45,7 @@ export function TravelApp({ searchParams = useSearchParams() }: TravelAppProps =
         </div>
         
         <TabsContent value="discover" className="space-y-8 animate-in fade-in duration-500">
-          <SearchBar />
+          <SearchBar onSearch={onSearch} defaultValue={query} />
           <MasonryGrid 
             destinations={filteredDestinations} 
             onSelectDestination={setSelectedDest} 

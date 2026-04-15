@@ -1,8 +1,29 @@
-import React from 'react';
+'use client'
+import React, { useTransition } from 'react';
 import { Suspense } from 'react'
 import { TravelApp } from '@/components/TravelApp'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
+
+  const handleSearch = (term: string) => {
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (term) {
+        params.set('q', term)
+      } else {
+        params.delete('q')
+      }
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    })
+  }
+
+  const currentQuery = searchParams.get('q') || ''
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900 selection:bg-primary/30">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 max-w-7xl">
@@ -23,7 +44,10 @@ export default function Home() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
           }>
-            <TravelApp />
+            <TravelApp 
+              onSearch={handleSearch} 
+              query={currentQuery} 
+            />
           </Suspense>
         </section>
       </div>

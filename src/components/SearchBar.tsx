@@ -1,37 +1,20 @@
 'use client'
-import React from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
-import { useTransition, useState, useMemo } from 'react'
-
 
 export interface SearchBarProps {
-  router?: any;
-  pathname?: string;
-  searchParams?: URLSearchParams;
+  onSearch: (term: string) => void;
+  defaultValue?: string;
 }
 
-export function SearchBar({ 
-  router = useRouter(), 
-  pathname = usePathname(), 
-  searchParams = useSearchParams() 
-}: SearchBarProps = {}) {
-  const [isPending, startTransition] = useTransition()
-  const [query, setQuery] = useState(searchParams.get('q') || '')
+export function SearchBar({ onSearch, defaultValue = '' }: SearchBarProps) {
+  const [query, setQuery] = useState(defaultValue)
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value
     setQuery(term)
-    startTransition(() => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (term) {
-        params.set('q', term)
-      } else {
-        params.delete('q')
-      }
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-    })
+    onSearch(term)
   }
 
   return (
@@ -42,7 +25,7 @@ export function SearchBar({
         className="pl-12 h-14 text-lg rounded-full border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg focus-visible:ring-primary transition-all duration-300 hover:shadow-xl"
         placeholder="Search destinations by name or tag (e.g., Paris, beach)..."
         value={query}
-        onChange={handleSearch}
+        onChange={handleChange}
       />
     </div>
   )
